@@ -64,7 +64,7 @@ For a **plane channel** of half-width $h$ the same analysis gives the closed for
 $$
 \frac{u(y)}{\bar U} = \frac{1 - \cosh(Ha\, y/h)/\cosh(Ha)}{1 - \tanh(Ha)/Ha},
 \qquad
-f\,Re = \frac{32\,Ha\tanh(Ha)}{1-\tanh(Ha)/Ha},
+f\,Re = \frac{32\,Ha^{2}}{1-\tanh(Ha)/Ha},
 $$
 
 with $Re = \bar U D_h/\nu$ and $D_h = 4h$; the limit $Ha\to0$ gives $f\,Re = 96$.

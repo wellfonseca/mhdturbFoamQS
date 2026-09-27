@@ -66,11 +66,18 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // Lorentz force from the potential of the previous step (predictor)
+        // Explicit part of the Lorentz force, evaluated from the fields of the
+        // previous time step (predictor). The stiff sink -sigma*|B0|^2*U of the
+        // complete force is deliberately left out: it is discretised
+        // implicitly in UEqn (see below), which removes the explicit damping
+        // limit dt < 2*rho/(sigma*|B0|^2) that otherwise forces a very small
+        // time step at high Hartmann number. Using
+        //     (U x B0) x B0 = B0*(U.B0) - |B0|^2*U
+        // the explicit part is sigma*(-grad(PotE) x B0) + sigma*B0*(U.B0).
         volVectorField lorentz
         (
             "lorentz",
-            sigma*(-fvc::grad(PotE) ^ B0) + sigma*((U ^ B0) ^ B0)
+            sigma*(-fvc::grad(PotE) ^ B0) + sigma*B0*(U & B0)
         );
 
         #include "CourantNo.H"
@@ -80,6 +87,7 @@ int main(int argc, char *argv[])
             fvm::ddt(U)
           + fvm::div(phi, U)
           + turbulence->divDevReff(U)
+          + fvm::Sp(sigma*magSqr(B0)/rho, U)
           - (1.0/rho)*lorentz
          ==
             fvOptions(U)
@@ -94,6 +102,15 @@ int main(int argc, char *argv[])
         }
 
         // --- PISO loop
+        //
+        // The outer corrector loop (piso.correct(), nCorrectors in fvSolution)
+        // is essential. rAU, HbyA and phiHbyA must be recomputed at EVERY
+        // corrector; with a single corrector the pressure-velocity coupling is
+        // only first order and the solution diverges even at Courant numbers
+        // well below one. This was verified on the channelHartmann case, where
+        // removing the loop makes the solution blow up at t = 3.4 s while the
+        // standard structure below remains stable.
+        while (piso.correct())
         {
             volScalarField rAU(1.0/UEqn.A());
             surfaceScalarField rAUf("rAUf", fvc::interpolate(rAU));
@@ -115,7 +132,7 @@ int main(int argc, char *argv[])
                 );
 
                 pEqn.setReference(pRefCell, pRefValue);
-                pEqn.solve(mesh.solver(p.select(piso.finalNonOrthogonalIter())));
+                pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
 
                 if (piso.finalNonOrthogonalIter())
                 {
@@ -124,12 +141,12 @@ int main(int argc, char *argv[])
             }
 
             #include "continuityErrs.H"
-            p.relax();
 
             U = HbyA - rAU*fvc::grad(p);
             U.correctBoundaryConditions();
-            fvOptions.correct(U);
         }
+
+        fvOptions.correct(U);
 
         // --- electric potential (quasi-static)
         {
@@ -137,12 +154,22 @@ int main(int argc, char *argv[])
 
             // Insulating walls: j.n = 0. The boundary flux of u x B0 is
             // excluded from BOTH sides of the potential equation: from the
-            // Laplacian (PotE is zeroGradient) and from the right-hand side.
-            // This gives j.n = -snGrad(PotE).n + (u x B0).n = 0.
+            // Laplacian (PotE is zeroGradient on the walls) and from the
+            // right-hand side. This gives j.n = -snGrad(PotE).n + (u x B0).n = 0.
+            //
+            // Only NON-coupled patches are zeroed. On cyclic and processor
+            // patches the flux is an internal one and must be kept:
+            // fvm::laplacian couples the two halves of a cyclic patch, so
+            // dropping the same contribution from the right-hand side would
+            // make the two sides of the equation inconsistent and put a
+            // spurious source in the cells next to the periodic plane.
             surfaceScalarField psiubInt("psiubInt", psiub);
             forAll(psiubInt.boundaryFieldRef(), patchi)
             {
-                psiubInt.boundaryFieldRef()[patchi] = 0.0;
+                if (!mesh.boundary()[patchi].coupled())
+                {
+                    psiubInt.boundaryFieldRef()[patchi] = 0.0;
+                }
             }
 
             fvScalarMatrix PotEEqn
@@ -166,7 +193,10 @@ int main(int argc, char *argv[])
             );
             jfinal.correctBoundaryConditions();
 
-            lorentz = sigma*(jfinal ^ B0);
+            // Explicit part of the force for the predictor of the next step:
+            // the complete force from the reconstructed current, minus the
+            // implicit sink already carried by UEqn.
+            lorentz = sigma*(jfinal ^ B0) + sigma*magSqr(B0)*U;
         }
 
         laminarTransport.correct();

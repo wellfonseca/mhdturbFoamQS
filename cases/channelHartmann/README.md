@@ -17,23 +17,23 @@ With $Ha = hB_0\sqrt{\sigma/\rho\nu}$, $D_h = 4h$ and $Re = \bar U D_h/\nu$:
 $$
 \frac{u(y)}{\bar U} = \frac{1-\cosh(Ha\,y/h)/\cosh(Ha)}{1-\tanh(Ha)/Ha},
 \qquad
-f\,Re = \frac{32\,Ha\tanh(Ha)}{1-\tanh(Ha)/Ha},
+f\,Re = \frac{32\,Ha^{2}}{1-\tanh(Ha)/Ha},
 \qquad
 f = \frac{2D_h G}{\bar U^2}.
 $$
 
-Limits: $f\,Re \to 96$ as $Ha\to0$ (plane Poiseuille) and $f\,Re \to 32Ha$ for
-large $Ha$.
+Limits: $f\,Re \to 96$ as $Ha\to0$ (plane Poiseuille) and $f\,Re \to 32Ha^{2}$
+for large $Ha$.
 
 ## Expected values
 
 | $Ha$ | $B_0$ (T) | $f\,Re$ exact |
 |---|---|---|
 | 0.0 | 0.0000 | 96.0000 |
-| 0.5 | 0.7678 | 97.5887 |
-| 1.0 | 1.5355 | 102.2249 |
-| 5.0 | 7.6776 | 199.9773 |
-| 10.0 | 15.3551 | 355.5556 |
+| 0.5 | 0.7678 | 105.5887 |
+| 1.0 | 1.5355 | 134.2249 |
+| 5.0 | 7.6776 | 999.9773 |
+| 10.0 | 15.3551 | 3555.5556 |
 
 ## Running
 
@@ -58,8 +58,16 @@ check.
 - `0/B0` is a `volVectorField` with `internalField` and wall values equal to
   $(0, B_0, 0)$; both have to be edited for each $Ha$.
 - `0/PotE` uses `zeroGradient` on all walls, together with the exclusion of the
-  boundary flux of $\mathbf{u}\times\mathbf{B}_0$ in the solver — the two halves
-  of the insulating condition. Changing one without the other imposes a
-  conducting wall and the verification will fail.
+  boundary flux of $\mathbf{u}\times\mathbf{B}_0$ on the non-coupled patches in
+  the solver — the two halves of the insulating condition. Changing one without
+  the other imposes a conducting wall and the verification will fail. Note that
+  the flux is kept on cyclic and processor patches: there it is an internal
+  flux, and dropping it would make the right-hand side inconsistent with the
+  Laplacian.
 - The channel is resolved with 100 uniform cells across the half-width, which
   resolves the Hartmann layer ($h/Ha = 5$ mm at $Ha = 10$) with several cells.
+- The time step is not limited by the magnetic damping: the stiff part
+  $-\sigma|\mathbf{B}_0|^2\mathbf{U}$ of the Lorentz force is discretised
+  implicitly in the momentum equation. With it treated explicitly the explicit
+  damping limit $2\rho/(\sigma|\mathbf{B}_0|^2) = 0.12$ s would be violated at
+  $Ha = 10$ ($\Delta t = 0.2$ s) and the run would diverge.

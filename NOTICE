@@ -43,8 +43,9 @@ The electric-potential (quasi-static) coupling is taken from:
 > flows.* CFD with OpenSource Software, Chalmers University of Technology.
 > <https://www.tfd.chalmers.se/~hani/kurser/OS_CFD_2016/AlessandroTassone/report_Tassone.pdf>
 
-The reference copy of the upstream source consulted is kept in
-`docs/referencia_epotFoam.C.txt` for traceability.
+The upstream source is available from the link above; it is not redistributed
+here. The corresponding solver in this package is
+`src/mhdturbFoamQS.C`.
 
 ## 4. What was added here
 

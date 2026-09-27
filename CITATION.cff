@@ -11,7 +11,7 @@ abstract: >-
 type: software
 license: GPL-3.0-or-later
 repository-code: "https://github.com/wellfonseca/mhdturbFoamQS"
-version: "0.1.0"
+version: "0.1.1"
 date-released: "2026-09-27"
 keywords:
   - magnetohydrodynamics
@@ -26,19 +26,15 @@ authors:
   - family-names: Fonseca
     given-names: Wellington da Silva
     affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-    orcid: ""
   - family-names: Araújo
     given-names: Ramon C. F.
     affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-    orcid: ""
   - family-names: Silva
     given-names: Marcelo de Oliveira e
     affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-    orcid: ""
   - family-names: Cruz
     given-names: Daniel Onofre de A.
     affiliation: "Mechanical Engineering Graduate Program, Federal University of Rio de Janeiro, Brazil"
-    orcid: ""
 references:
   - type: software
     title: "mhdturbFoam: an incompressible turbulent OpenFOAM solver for magnetohydrodynamic flows (FOSSEE case-study project)"

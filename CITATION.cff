@@ -23,19 +23,9 @@ keywords:
   - turbulence modelling
   - computational fluid dynamics
 authors:
-  # NOTE: suggested author list, to be confirmed by the group (see the manuscript)
   - family-names: Fonseca
     given-names: Wellington da Silva
     affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-  - family-names: Araújo
-    given-names: Ramon C. F.
-    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-  - family-names: Silva
-    given-names: Marcelo de Oliveira e
-    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
-  - family-names: Cruz
-    given-names: Daniel Onofre de A.
-    affiliation: "Mechanical Engineering Graduate Program, Federal University of Rio de Janeiro, Brazil"
 references:
   - type: software
     title: "mhdturbFoam: an incompressible turbulent OpenFOAM solver for magnetohydrodynamic flows (FOSSEE case-study project)"

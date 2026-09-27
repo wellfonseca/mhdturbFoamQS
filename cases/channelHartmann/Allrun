@@ -1,7 +1,6 @@
 #!/bin/bash
-# Run the Hartmann channel verification. Requires the solver to be installed.
-set -e
-cd "${0%/*}" 2>/dev/null || true
-blockMesh > log.blockMesh 2>&1
-echo "blockMesh: $(grep -c 'FOAM FATAL' log.blockMesh) errors"
-python3 verify.py
+cd "${0%/*}" || exit 1
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+runApplication blockMesh
+runApplication $(getApplication)

@@ -1,4 +1,5 @@
 #!/bin/bash
-cd "${0%/*}" 2>/dev/null || true
-rm -rf [0-9]* postProcessing log.* processor* 2>/dev/null
-rm -f 0/B0.orig
+cd "${0%/*}" || exit 1
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+cleanCase

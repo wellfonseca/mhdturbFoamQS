@@ -40,20 +40,23 @@ large $Ha$.
 Requires OpenFOAM 6 and the solver installed (`wmake` in `../../src`).
 
 ```bash
-bash Allrun
+bash Allrun      # blockMesh + mhdturbFoamQS
 ```
 
-`Allrun` runs `blockMesh`, sweeps $Ha$, and prints the comparison between the
-computed and exact $f\,Re$. `Allclean` removes the results.
+`0/B0` ships with $B_0 = 0$ (plain plane Poiseuille). To run a Hartmann case, set
+both the `internalField` and the wall `value` of `0/B0` to $(0, B_0, 0)$ with the
+$B_0$ from the table above, then rerun. The bulk velocity is written as a volume
+average of `U` in `postProcessing/volFieldValue1/`; take its last value and form
+$f\,Re$ with the relations given above. `Allclean` removes the results.
 
 The case is deliberately tiny (100 cells, one cell in the streamwise direction):
-a complete sweep takes seconds, which is what makes it usable as a routine
-regression check.
+one $Ha$ runs in seconds, which is what makes it usable as a routine regression
+check.
 
 ## Notes
 
 - `0/B0` is a `volVectorField` with `internalField` and wall values equal to
-  $(0, B_0, 0)$; `verify.py` rewrites it for each $Ha$ in the sweep.
+  $(0, B_0, 0)$; both have to be edited for each $Ha$.
 - `0/PotE` uses `zeroGradient` on all walls, together with the exclusion of the
   boundary flux of $\mathbf{u}\times\mathbf{B}_0$ in the solver — the two halves
   of the insulating condition. Changing one without the other imposes a

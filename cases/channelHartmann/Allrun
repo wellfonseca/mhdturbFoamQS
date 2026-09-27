@@ -1,9 +1,12 @@
-#!/bin/bash
-# Enter the case directory whatever the invocation: "bash Allrun", "./Allrun"
-# or "bash cases/channelHartmann/Allrun". The usual "${0%/*}" idiom fails for
-# the first of these, because $0 is then just "Allrun".
+#!/bin/sh
+# Fail loudly: the stock OpenFOAM Allrun carries on even when a step fails, so
+# a run that produces nothing still looks successful.
+set -e
+
 cd "$(dirname "$0")" || exit 1
+
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 runApplication blockMesh
 runApplication $(getApplication)
+runApplication -s sample postProcess -func sample

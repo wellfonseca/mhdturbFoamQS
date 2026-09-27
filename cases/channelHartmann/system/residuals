@@ -9,38 +9,18 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      PotE;
+    class       dictionary;
+    location    "system";
+    object      residuals;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 2 -3 0 0 -1 0];
+type            residuals;
+libs            ("libutilityFunctionObjects.so");
 
-internalField   uniform 0;
+fields          (p U PotE);
 
-boundaryField
-{
-    left
-    {
-        type            cyclic;
-    }
-    right
-    {
-        type            cyclic;
-    }
-    lowerWall
-    {
-        type            zeroGradient;
-    }
-    upperWall
-    {
-        type            zeroGradient;
-    }
-    frontAndBack
-    {
-        type            empty;
-    }
-}
+writeControl    timeStep;
+writeInterval   20;
 
 // ************************************************************************* //

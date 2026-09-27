@@ -136,7 +136,8 @@ The case must provide, in `0/`:
 | turbulence fields | `nuTilda`(SA), `k`/`epsilon`, `k`/`omega` — as usual |
 
 and in `system/fvSolution` a `PotE` entry (solver) plus a `PotE` sub-dictionary
-with `PotERefCell`/`PotERefValue`.
+with `PotERefCell`/`PotERefValue`. Body forces and other sources go in
+`constant/fvOptions`, as in the OpenFOAM 6 tutorials.
 
 Two conditions have to match the solver, or the current will be wrong:
 
@@ -162,11 +163,13 @@ fully developed MHD flow in a circular pipe with insulating walls
 (Shercliff 1953; Gold 1962; Uhlenbusch & Fischer 1961), which gives
 $f\,Re$ as a function of the Hartmann number independently of $Re$.
 
-`cases/channelHartmann` contains a small plane-channel Hartmann case with the
-exact solution, used to verify the implementation in seconds. It reproduces the
-exact friction factor to within **0.055 %** at every Hartmann number
+`cases/channelHartmann` contains a plane-channel Hartmann case with the exact
+solution, built on the geometry of the OpenFOAM 6 `mhdFoam/hartmann` tutorial and
+following the same conventions (`constant/fvOptions`, `#includeFunc`, profile
+sampled by the standard `sample` function). It reproduces the exact friction
+factor to within **0.055 %** at every Hartmann number
 ($Ha = 0, 0.5, 1, 5, 10$), the largest deviation being at the strongest field
-and the smallest at $Ha = 0$; the five runs take about 15 s in total. Details
+and the smallest at $Ha = 0$; the five runs take about 20 s in total. Details
 are in the case README and in the accompanying paper.
 
 ## 7. Status and limitations

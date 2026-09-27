@@ -9,38 +9,35 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       volScalarField;
-    location    "0";
-    object      PotE;
+    class       dictionary;
+    location    "system";
+    object      sample;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 2 -3 0 0 -1 0];
+type            sets;
+libs            ("libsampling.so");
 
-internalField   uniform 0;
+interpolationScheme cellPoint;
+writeControl    writeTime;
+setFormat       raw;
 
-boundaryField
-{
-    left
+sets
+(
+    centreProfile
     {
-        type            cyclic;
+        type    lineUniform;
+        axis    distance;
+        // Os extremos coincidem com os centros das celulas de parede, de
+        // modo que os 100 pontos caem exactamente nos 100 centros de
+        // celula e a amostragem reproduz o campo sem erro de
+        // interpolacao.
+        start   (10 -0.99 0.05);
+        end     (10 0.99 0.05);
+        nPoints 100;
     }
-    right
-    {
-        type            cyclic;
-    }
-    lowerWall
-    {
-        type            zeroGradient;
-    }
-    upperWall
-    {
-        type            zeroGradient;
-    }
-    frontAndBack
-    {
-        type            empty;
-    }
-}
+);
+
+fields          ( U );
 
 // ************************************************************************* //

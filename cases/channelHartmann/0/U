@@ -1,12 +1,46 @@
-FoamFile { version 2.0; format ascii; class volVectorField; object U; }
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6                                     |
+|   \\  /    A nd           | Website:  www.openfoam.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 dimensions      [0 1 -1 0 0 0 0];
+
 internalField   uniform (0 0 0);
+
 boundaryField
 {
-    left    { type cyclic; }
-    right   { type cyclic; }
-    bottom  { type noSlip; }
-    top     { type noSlip; }
-    front   { type empty; }
-    back    { type empty; }
+    left
+    {
+        type            cyclic;
+    }
+    right
+    {
+        type            cyclic;
+    }
+    lowerWall
+    {
+        type            noSlip;
+    }
+    upperWall
+    {
+        type            noSlip;
+    }
+    frontAndBack
+    {
+        type            empty;
+    }
 }
+
+// ************************************************************************* //

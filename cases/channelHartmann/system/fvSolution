@@ -1,10 +1,65 @@
-FoamFile { version 2.0; format ascii; class dictionary; object fvSolution; }
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6                                     |
+|   \\  /    A nd           | Website:  www.openfoam.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 solvers
 {
-    p      { solver GAMG; smoother GaussSeidel; tolerance 1e-11; relTol 0; }
-    pFinal { solver GAMG; smoother GaussSeidel; tolerance 1e-11; relTol 0; }
-    PotE { solver GAMG; smoother GaussSeidel; tolerance 1e-12; relTol 0; }
-    U    { solver smoothSolver; smoother symGaussSeidel; tolerance 1e-11; relTol 0; }
+    p
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-11;
+        relTol          0;
+    }
+
+    pFinal
+    {
+        $p;
+    }
+
+    PotE
+    {
+        solver          GAMG;
+        smoother        GaussSeidel;
+        tolerance       1e-12;
+        relTol          0;
+    }
+
+    U
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-11;
+        relTol          0;
+    }
 }
-PISO { pRefCell 0; pRefValue 0; nCorrectors 3; nNonOrthogonalCorrectors 0; }
-PotE { PotERefCell 0; PotERefValue 0; }
+
+PISO
+{
+    nCorrectors             3;
+    nNonOrthogonalCorrectors 0;
+    pRefCell                0;
+    pRefValue               0;
+}
+
+// Reference cell for the singular potential Poisson problem
+PotE
+{
+    PotERefCell             0;
+    PotERefValue            0;
+}
+
+// ************************************************************************* //

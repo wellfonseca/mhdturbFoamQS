@@ -1,22 +1,88 @@
-FoamFile { version 2.0; format ascii; class dictionary; object blockMeshDict; }
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  6                                     |
+|   \\  /    A nd           | Website:  www.openfoam.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 convertToMeters 1;
+
+// Same channel geometry as the OpenFOAM 6 tutorial
+// tutorials/electromagnetics/mhdFoam/hartmann: length 20, height 2,
+// thickness 0.1.  The mesh follows the OpenFOAM convention for a fully
+// developed periodic channel (cf. planarPoiseuille): a single cell in the
+// streamwise direction, since the solution does not vary along x.  The
+// cross-channel direction carries 100 cells so that the Hartmann layer
+// (h/Ha = 0.1 m = 5 cells at Ha = 10) is resolved.
+// The streamwise direction is cyclic instead of inlet/outlet so that the flow
+// is fully developed and the closed-form Hartmann solution applies exactly.
+
 vertices
 (
-    (0 -0.05 0) (0.05 -0.05 0) (0.05 0.05 0) (0 0.05 0)
-    (0 -0.05 0.002) (0.05 -0.05 0.002) (0.05 0.05 0.002) (0 0.05 0.002)
+    (0 -1 0)
+    (20 -1 0)
+    (20 1 0)
+    (0 1 0)
+    (0 -1 0.1)
+    (20 -1 0.1)
+    (20 1 0.1)
+    (0 1 0.1)
 );
+
 blocks
 (
     hex (0 1 2 3 4 5 6 7) (1 100 1) simpleGrading (1 1 1)
 );
-edges ();
+
+edges
+(
+);
+
 boundary
 (
-    left    { type cyclic; neighbourPatch right; faces ((0 4 7 3)); }
-    right   { type cyclic; neighbourPatch left;  faces ((1 2 6 5)); }
-    bottom  { type wall;   faces ((0 1 5 4)); }
-    top     { type wall;   faces ((3 7 6 2)); }
-    front   { type empty;  faces ((0 3 2 1)); }
-    back    { type empty;  faces ((4 5 6 7)); }
+    left
+    {
+        type cyclic;
+        neighbourPatch right;
+        faces ((0 4 7 3));
+    }
+    right
+    {
+        type cyclic;
+        neighbourPatch left;
+        faces ((1 2 6 5));
+    }
+    lowerWall
+    {
+        type wall;
+        faces ((0 1 5 4));
+    }
+    upperWall
+    {
+        type wall;
+        faces ((3 7 6 2));
+    }
+    frontAndBack
+    {
+        type empty;
+        faces
+        (
+            (0 3 2 1)
+            (4 5 6 7)
+        );
+    }
 );
-mergePatchPairs ();
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

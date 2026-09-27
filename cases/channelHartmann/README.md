@@ -53,7 +53,7 @@ regression check.
 ## Notes
 
 - `0/B0` is a `volVectorField` with `internalField` and wall values equal to
-  $(0, B_0, 0)$; `gera_caso.py` rewrites it for each $Ha$ in the sweep.
+  $(0, B_0, 0)$; `verify.py` rewrites it for each $Ha$ in the sweep.
 - `0/PotE` uses `zeroGradient` on all walls, together with the exclusion of the
   boundary flux of $\mathbf{u}\times\mathbf{B}_0$ in the solver — the two halves
   of the insulating condition. Changing one without the other imposes a

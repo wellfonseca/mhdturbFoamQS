@@ -1,11 +1,12 @@
-# OpenFOAM run products (mas o 0/ dos casos e' ENTRADA e fica versionado)
+# OpenFOAM run products (the 0/ directory of each case is INPUT and is tracked)
 [1-9][0-9]*/
 processor*/
 postProcessing/
 log.*
 *.e[0-9]*
 *.o[0-9]*
-# binarios e temporarios
+__pycache__/
+# build products and temporary files
 *.o
 *.so
 *.dep
@@ -13,6 +14,6 @@ Make/linux*/
 platforms/
 *.swp
 
-# excepcao: os directorios 0/ dos casos sao entrada
+# exception: the 0/ directories of the cases are input
 !cases/*/0/
 !cases/*/0/**

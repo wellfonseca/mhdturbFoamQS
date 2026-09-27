@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
-"""verifica.py -- corre o canal de Hartmann para varios Ha e compara f*Re com a
-solucao exacta. Requer o solver mhdturbFoamQS e o OpenFOAM 6 no PATH."""
+"""
+verify.py -- run the Hartmann channel for several Ha and compare f*Re with the
+exact solution. Requires the mhdturbFoamQS solver and OpenFOAM 6 in PATH.
+
+Usage: python3 verify.py           (run from the case directory)
+       SOLVER=other python3 verify.py
+"""
 import math
 import os
 import re
@@ -17,7 +22,8 @@ HB = math.sqrt(SIGMA / (RHO * NU))
 SOLVER = os.environ.get('SOLVER', 'mhdturbFoamQS')
 
 
-def exacto(Ha):
+def exact(Ha):
+    """Exact friction factor times Reynolds number, plane Hartmann channel."""
     if Ha == 0:
         return 96.0
     t = math.tanh(Ha)
@@ -25,9 +31,9 @@ def exacto(Ha):
 
 
 def main():
-    print('Ha      B0[T]      Ubar(sim)   f*Re(sim)   f*Re(exacto)   desvio')
+    print('Ha      B0[T]      Ubar(sim)   f*Re(sim)   f*Re(exact)   deviation')
     print('-' * 72)
-    piores = []
+    worst = []
     for Ha in (0.0, 0.5, 1.0, 5.0, 10.0):
         b = Ha / (H * HB)
         s = open('0/B0').read()
@@ -44,24 +50,24 @@ def main():
                            stderr=subprocess.STDOUT, universal_newlines=True)
         log = r.stdout
         if 'FOAM FATAL' in log:
-            print('%5.2f  %8.4f   FALHOU -- ver log.ha%s' % (Ha, b, Ha))
+            print('%5.2f  %8.4f   FAILED -- see log.ha%s' % (Ha, b, Ha))
             open('log.ha%s' % Ha, 'w').write(log)
             continue
         m = re.findall(r'volAverage\(\) of U\s*=\s*\(\s*([0-9.eE+-]+)', log)
         if not m:
-            print('%5.2f  %8.4f   sem Ubar no log' % (Ha, b))
+            print('%5.2f  %8.4f   no Ubar in the log' % (Ha, b))
             continue
         Ub = float(m[-1])
         fRe = (2 * DH * G / Ub ** 2) * (Ub * DH / NU)
-        ex = exacto(Ha)
+        ex = exact(Ha)
         d = 100 * (fRe - ex) / ex
-        piores.append(abs(d))
+        worst.append(abs(d))
         print('%5.2f  %8.4f   %9.6f   %9.4f   %9.4f      %+7.3f %%'
               % (Ha, b, Ub, fRe, ex, d))
-    if piores:
+    if worst:
         print()
-        print('desvio absoluto maximo: %.3f %%' % max(piores))
-        print('criterio de aceitacao sugerido: < 1 %% em todos os Ha')
+        print('maximum absolute deviation: %.3f %%' % max(worst))
+        print('suggested acceptance criterion: < 1 %% at every Ha')
 
 
 if __name__ == '__main__':

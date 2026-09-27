@@ -1,40 +1,42 @@
 #!/usr/bin/env python3
 """
-gera_canal_hartmann.py -- cria o caso de canal plano (Hartmann) para validar o
-solver quase-estatico mhdturbFoamQS contra a solucao EXACTA.
+make_case.py -- write the plane-channel Hartmann verification case.
 
-Geometria: x in [0, L] (1 celula, ciclico), y in [-h, h] (paredes), z (1 celula, empty)
-Campo B0 = (0, B0, 0) uniforme, PERPENDICULAR as paredes, paredes isolantes.
-Escoamento forcado por gradiente de pressao fixo G (vectorSemiImplicitSource).
+Geometry: x in [0, L] (one cell, cyclic), y in [-h, h] (walls), z (one cell,
+empty). Uniform magnetic field B0 = (0, B0, 0), normal to the walls, with
+electrically insulating walls. The flow is driven by a fixed pressure gradient
+imposed with vectorSemiImplicitSource.
 
-Solucao exacta (u(y) e f*Re):
+Exact solution (see README.md):
+
     u/Ubar = [1 - cosh(Ha y/h)/cosh(Ha)] / [1 - tanh(Ha)/Ha]
-    f*Re   = 32 Ha tanh(Ha) / [1 - tanh(Ha)/Ha],   Re = Ubar*D_h/nu, D_h = 4h
-    Ha = h B0 sqrt(sigma/(rho nu))
-Limites: Ha->0 -> f*Re = 96 (Poiseuille plano).
+    f*Re   = 32 Ha tanh(Ha) / [1 - tanh(Ha)/Ha],   Re = Ubar*Dh/nu, Dh = 4h
+    Ha     = h B0 sqrt(sigma/(rho nu))
 
-Uso: python3 gera_canal_hartmann.py [dir]
+Limit: Ha -> 0 gives f*Re = 96 (plane Poiseuille).
+
+Usage: python3 make_case.py [directory]
 """
 import math
 import os
 import sys
 
-L, H, T = 0.05, 0.05, 0.002          # meio-canal H, espessura T
-NY = 100
-G = 0.0105                            # gradiente de pressao [m/s2]
+L, H, T = 0.05, 0.05, 0.002        # length, half-width, thickness [m]
+NY = 100                           # cells across the half-width
+G = 0.0105                         # imposed pressure gradient [m/s^2]
 RHO, NU, SIGMA = 1000.0, 4.1792e-4, 70.9
 MU0 = 1.2566e-6
-HB = math.sqrt(SIGMA / (RHO * NU))
-DEST = sys.argv[1] if len(sys.argv) > 1 else 'canal_hartmann'
+HB = math.sqrt(SIGMA / (RHO * NU))  # Ha = B0 * H * HB
+DEST = sys.argv[1] if len(sys.argv) > 1 else 'channelHartmann'
 
 
-def w(path, txt):
+def write(path, text):
     p = os.path.join(DEST, path)
     os.makedirs(os.path.dirname(p), exist_ok=True)
-    open(p, 'w').write(txt)
+    open(p, 'w').write(text)
 
 
-BM = """FoamFile { version 2.0; format ascii; class dictionary; object blockMeshDict; }
+BLOCKMESH = """FoamFile { version 2.0; format ascii; class dictionary; object blockMeshDict; }
 convertToMeters 1;
 vertices
 (
@@ -67,7 +69,7 @@ interpolationSchemes { default linear; }
 snGradSchemes   { default corrected; }
 """
 
-FVSOL = """FoamFile { version 2.0; format ascii; class dictionary; object fvSolution; }
+FVSOLUTION = """FoamFile { version 2.0; format ascii; class dictionary; object fvSolution; }
 solvers
 {
     p      { solver GAMG; smoother GaussSeidel; tolerance 1e-11; relTol 0; }
@@ -111,7 +113,7 @@ functions
 }
 """
 
-FVO = """FoamFile { version 2.0; format ascii; class dictionary; object fvOptions; }
+FVOPTIONS = """FoamFile { version 2.0; format ascii; class dictionary; object fvOptions; }
 momentumSource
 {
     type            vectorSemiImplicitSource;
@@ -130,58 +132,63 @@ mu      mu  [1 1 -2 0 0 -2 0] %(MU0)s;
 sigma   sigma [-1 -3 3 0 0 2 0] %(SIGMA)s;
 """ % dict(RHO=RHO, NU=NU, MU0=MU0, SIGMA=SIGMA)
 
-TURB = """FoamFile { version 2.0; format ascii; class dictionary; object turbulenceProperties; }
+TURBULENCE = """FoamFile { version 2.0; format ascii; class dictionary; object turbulenceProperties; }
 simulationType  laminar;
 """
 
 
-def campo(nome, cls, dims, interno, paredes, extra=''):
-    return """FoamFile { version 2.0; format ascii; class %(cls)s; object %(nome)s; }
+def field(name, cls, dims, internal, wall_bc, extra=''):
+    """Build a field file with the patch layout of this case."""
+    return """FoamFile { version 2.0; format ascii; class %(cls)s; object %(name)s; }
 dimensions      %(dims)s;
-internalField   uniform %(interno)s;
+internalField   uniform %(internal)s;
 boundaryField
 {
     left    { type cyclic; }
     right   { type cyclic; }
-    bottom  { %(paredes)s }
-    top     { %(paredes)s }
+    bottom  { %(wall_bc)s }
+    top     { %(wall_bc)s }
     front   { type empty; }
     back    { type empty; }
 %(extra)s}
-""" % dict(cls=cls, nome=nome, dims=dims, interno=interno, paredes=paredes, extra=extra)
+""" % dict(cls=cls, name=name, dims=dims, internal=internal,
+           wall_bc=wall_bc, extra=extra)
 
 
-U = campo('U', 'volVectorField', '[0 1 -1 0 0 0 0]', '(0 0 0)', 'type noSlip;')
-P = campo('p', 'volScalarField', '[0 2 -2 0 0 0 0]', '0', 'type zeroGradient;')
-POTE = campo('PotE', 'volScalarField', '[1 2 -3 0 0 -1 0]', '0', 'type zeroGradient;')
+U_FIELD = field('U', 'volVectorField', '[0 1 -1 0 0 0 0]', '(0 0 0)',
+                'type noSlip;')
+P_FIELD = field('p', 'volScalarField', '[0 2 -2 0 0 0 0]', '0',
+                'type zeroGradient;')
+POTE_FIELD = field('PotE', 'volScalarField', '[1 2 -3 0 0 -1 0]', '0',
+                   'type zeroGradient;')
 
 
-def b0_file(B):
-    return campo('B0', 'volVectorField', '[1 0 -2 0 0 -1 0]', '(0 %s 0)' % B,
-                 'type fixedValue; value uniform (0 %s 0);' % B)
+def b0_field(b):
+    return field('B0', 'volVectorField', '[1 0 -2 0 0 -1 0]', '(0 %s 0)' % b,
+                 'type fixedValue; value uniform (0 %s 0);' % b)
 
 
 def main():
     os.makedirs(DEST, exist_ok=True)
-    w('system/blockMeshDict', BM)
-    w('system/fvSchemes', FVSCHEMES)
-    w('system/fvSolution', FVSOL)
-    w('system/controlDict', CONTROL)
-    w('system/fvOptions', FVO)
-    w('constant/transportProperties', TRANSPORT)
-    w('constant/turbulenceProperties', TURB)
-    w('0/U', U)
-    w('0/p', P)
-    w('0/PotE', POTE)
-    w('0/B0', b0_file(0.0))
-    print("caso criado em", DEST)
-    print("Ha = h*B0*sqrt(sigma/(rho nu)) = B0 * %.6f" % (H * HB))
-    for Ha in (0.0, 0.5, 1.0, 5.0, 10.0):
-        b = Ha / (H * HB)
-        t = math.tanh(Ha)
-        fRe = 96.0 if Ha == 0 else 32.0 * Ha * t / (1.0 - t / Ha)
-        print("   Ha=%5.2f  B0=%9.4f T   f*Re(exacto)=%9.4f" % (Ha, b, fRe))
-    print("   G = %.6f m/s2 ; D_h = %.4f m" % (G, 4 * H))
+    write('system/blockMeshDict', BLOCKMESH)
+    write('system/fvSchemes', FVSCHEMES)
+    write('system/fvSolution', FVSOLUTION)
+    write('system/controlDict', CONTROL)
+    write('system/fvOptions', FVOPTIONS)
+    write('constant/transportProperties', TRANSPORT)
+    write('constant/turbulenceProperties', TURBULENCE)
+    write('0/U', U_FIELD)
+    write('0/p', P_FIELD)
+    write('0/PotE', POTE_FIELD)
+    write('0/B0', b0_field(0.0))
+    print("case written to", DEST)
+    print("Ha = h B0 sqrt(sigma/(rho nu)) = B0 * %.6f" % (H * HB))
+    for ha in (0.0, 0.5, 1.0, 5.0, 10.0):
+        b = ha / (H * HB)
+        t = math.tanh(ha)
+        fRe = 96.0 if ha == 0 else 32.0 * ha * t / (1.0 - t / ha)
+        print("   Ha=%5.2f  B0=%9.4f T   f*Re(exact)=%9.4f" % (ha, b, fRe))
+    print("   G = %.6f m/s2 ; Dh = %.4f m" % (G, 4 * H))
 
 
 if __name__ == '__main__':

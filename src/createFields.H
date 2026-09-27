@@ -26,7 +26,7 @@ dimensionedScalar nu
     transportProperties
 );
 
-// permeabilidade magnetica (nome historico "mu" em transportProperties)
+// magnetic permeability (named "mu" in transportProperties)
 dimensionedScalar mu
 (
     "mu",

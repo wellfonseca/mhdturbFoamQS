@@ -9,25 +9,25 @@ Application
     mhdturbFoamQS
 
 Description
-    Solver MHD turbulento incompressivel na APROXIMACAO QUASE-ESTATICA
-    (baixo Rm), com modelos de turbulencia standard:
+    Incompressible turbulent MHD solver in the QUASI-STATIC (low-Rm)
+    approximation, using the standard OpenFOAM turbulence models:
 
         ddt(U) + div(phi,U) + divDevReff(U) = -grad(p) + (1/rho) j x B0
         div(U) = 0
-        lap(PotE) = div(u x B0)          (conservacao da carga)
+        lap(PotE) = div(u x B0)          (charge conservation)
         j = sigma (-grad(PotE) + u x B0)
 
-    A forca de Lorentz e' obtida directamente da densidade de corrente, e NAO
-    pela tensao de Maxwell do campo total. Isso e' essencial quando o campo
-    imposto B0 e' NAO-UNIFORME (imas alternados): na formulacao de inducao
-    completa os dois termos da tensao de Maxwell sao O(B0^2/mu0) e o seu
-    cancelamento discreto deixa de ser exacto, gerando uma forca espuria
-    ~ (dx/L)^2 B0^2/(mu0 L rho) que domina a forca fisica.
+    The Lorentz force is obtained directly from the current density, NOT from
+    the Maxwell stress of the total field. This matters when the applied field
+    B0 is NON-UNIFORM (e.g. alternating magnets): in the full-induction
+    formulation the two Maxwell-stress terms are O(B0^2/mu0) and their discrete
+    cancellation is no longer exact, leaving a spurious force of order
+    (dx/L)^2 B0^2/(mu0 L rho) that dominates the physical force.
 
-    Paredes ELECTRICAMENTE ISOLANTES: j.n = 0 em todas as fronteiras, o que
-    se implementa excluindo o fluxo de u x B0 nas faces de fronteira.
+    Electrically insulating walls: j.n = 0 on all boundaries, implemented by
+    excluding the boundary flux of u x B0.
 
-    Valido para Rm = mu0 sigma U L << 1 (aqui Rm ~ 3.7e-4).
+    Valid for Rm = mu0 sigma U L << 1.
 
 \*---------------------------------------------------------------------------*/
 
@@ -44,8 +44,8 @@ int main(int argc, char *argv[])
 {
     argList::addNote
     (
-        "MHD turbulento incompressivel, aproximacao quase-estatica (baixo Rm),"
-        " com modelos de turbulencia standard."
+        "Incompressible turbulent MHD solver in the quasi-static (low-Rm)"
+        " approximation, using the standard OpenFOAM turbulence models."
     );
 
     #include "postProcess.H"
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // forca de Lorentz com o potencial do passo anterior (predictor)
+        // Lorentz force from the potential of the previous step (predictor)
         volVectorField lorentz
         (
             "lorentz",
@@ -131,13 +131,14 @@ int main(int argc, char *argv[])
             fvOptions.correct(U);
         }
 
-        // --- potencial electrico (quase-estatico)
+        // --- electric potential (quasi-static)
         {
             surfaceScalarField psiub = fvc::interpolate(U ^ B0) & mesh.Sf();
 
-            // paredes isolantes: j.n = 0 -> o fluxo de u x B0 na fronteira nao
-            // entra nem no laplaciano (PotE com zeroGradient) nem no segundo
-            // membro, o que da j.n = -snGrad(PotE).n + (u x B0).n = 0.
+            // Insulating walls: j.n = 0. The boundary flux of u x B0 is
+            // excluded from BOTH sides of the potential equation: from the
+            // Laplacian (PotE is zeroGradient) and from the right-hand side.
+            // This gives j.n = -snGrad(PotE).n + (u x B0).n = 0.
             surfaceScalarField psiubInt("psiubInt", psiub);
             forAll(psiubInt.boundaryFieldRef(), patchi)
             {

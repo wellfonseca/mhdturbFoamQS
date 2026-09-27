@@ -171,6 +171,9 @@ reported in the accompanying paper and in `docs/formulation.md`.
 See `CITATION.cff`. If you use this solver, please cite the accompanying paper
 **and** the two upstream works listed in `NOTICE`.
 
+The repository is at <https://github.com/wellfonseca/mhdturbFoamQS>.
+A permanent archive with a DOI is deposited at Zenodo (see `CITATION.cff`).
+
 ## 9. License
 
 GNU General Public License v3.0 — see `LICENSE`. This is mandatory: the code

@@ -10,7 +10,7 @@ abstract: >-
   standard OpenFOAM turbulence closures unmodified.
 type: software
 license: GPL-3.0-or-later
-repository-code: "https://github.com/<org>/mhdturbFoamQS"
+repository-code: "https://github.com/wellfonseca/mhdturbFoamQS"
 version: "0.1.0"
 date-released: "2026-09-27"
 keywords:

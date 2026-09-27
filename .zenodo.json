@@ -1,0 +1,59 @@
+{
+  "title": "mhdturbFoamQS: a quasi-static MHD solver for OpenFOAM with non-uniform applied magnetic fields",
+  "description": "<p>An OpenFOAM 6 solver for incompressible turbulent magnetohydrodynamic flows in the low-magnetic-Reynolds-number regime, using the electric-potential (quasi-static) formulation with a prescribed, possibly non-uniform, applied magnetic field.</p><p>The solver exists because the full magnetic-induction formulation used by OpenFOAM's standard MHD solvers evaluates the Lorentz force in Maxwell-stress form as the difference of two terms of order B0^2/(mu0 rho); that cancellation is exact only for a uniform field. For a non-uniform applied field the residual spurious acceleration reaches 10^3 m/s^2, several times the physical Lorentz acceleration, and the solution diverges. mhdturbFoamQS removes the cancellation by construction: the current density is obtained from a Poisson problem for the electric potential and the force is evaluated directly from j x B0.</p><p>Features: the applied field is read as a general volVectorField; the insulating-wall condition j.n = 0 is imposed consistently on both sides of the potential equation; fvOptions are supported in the momentum equation; and a reference cell is available for the singular Poisson problem in closed or fully periodic domains. The standard OpenFOAM turbulence closures (Spalart-Allmaras, k-epsilon, k-omega SST) are used unmodified.</p><p>The package includes the solver source, the build files, and a small plane-channel Hartmann verification case (100 cells, runs in seconds) with its exact solution, together with a script that sweeps the Hartmann number and reports the deviation from the analytical f Re.</p>",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "GPL-3.0-or-later",
+  "language": "eng",
+  "version": "0.1.0",
+  "keywords": [
+    "magnetohydrodynamics",
+    "MHD",
+    "OpenFOAM",
+    "quasi-static approximation",
+    "electric potential formulation",
+    "turbulence modelling",
+    "computational fluid dynamics",
+    "liquid metal",
+    "Hartmann flow"
+  ],
+  "creators": [
+    {
+      "name": "Fonseca, Wellington da Silva",
+      "affiliation": "Mechanical Engineering Graduate Program, Federal University of Para, Belem, Brazil"
+    },
+    {
+      "name": "Araujo, Ramon C. F.",
+      "affiliation": "Mechanical Engineering Graduate Program, Federal University of Para, Belem, Brazil"
+    },
+    {
+      "name": "Silva, Marcelo de Oliveira e",
+      "affiliation": "Mechanical Engineering Graduate Program, Federal University of Para, Belem, Brazil"
+    },
+    {
+      "name": "Cruz, Daniel Onofre de A.",
+      "affiliation": "Mechanical Engineering Graduate Program, Federal University of Rio de Janeiro, Brazil"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://openfoam.org/version/6",
+      "relation": "isDerivedFrom",
+      "resource_type": "software",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://www.tfd.chalmers.se/~hani/kurser/OS_CFD_2016/AlessandroTassone/report_Tassone.pdf",
+      "relation": "isDerivedFrom",
+      "resource_type": "publication-report",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/wellfonseca/mhdturbFoamQS",
+      "relation": "isSupplementTo",
+      "resource_type": "software",
+      "scheme": "url"
+    }
+  ],
+  "notes": "Derives from OpenFOAM 6 (OpenFOAM Foundation), from the turbulent MHD solver mhdturbFoam of the FOSSEE case-study project (R. Radhakrishnan, VIT Vellore, 2019, developed on OpenFOAM v1812), and from the electric-potential solver epotFoam (A. Tassone, Chalmers University of Technology, 2016). All three are credited in the NOTICE file. Distributed under GPL v3, which is mandatory given the upstream licences."
+}

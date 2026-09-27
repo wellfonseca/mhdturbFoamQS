@@ -11,6 +11,7 @@ abstract: >-
 type: software
 license: GPL-3.0-or-later
 repository-code: "https://github.com/wellfonseca/mhdturbFoamQS"
+doi: "10.5281/zenodo.23000119"
 version: "0.1.1"
 date-released: "2026-09-27"
 keywords:

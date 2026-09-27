@@ -168,11 +168,15 @@ reported in the accompanying paper and in `docs/formulation.md`.
 
 ## 8. Citation
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23000119.svg)](https://doi.org/10.5281/zenodo.23000119)
+
 See `CITATION.cff`. If you use this solver, please cite the accompanying paper
 **and** the two upstream works listed in `NOTICE`.
 
-The repository is at <https://github.com/wellfonseca/mhdturbFoamQS>.
-A permanent archive with a DOI is deposited at Zenodo (see `CITATION.cff`).
+The repository is at <https://github.com/wellfonseca/mhdturbFoamQS>. Releases are
+permanently archived at Zenodo under the concept DOI
+[10.5281/zenodo.23000119](https://doi.org/10.5281/zenodo.23000119), which always
+resolves to the most recent archived version.
 
 ## 9. License
 

@@ -79,9 +79,9 @@ f_\text{spurious} \sim \left(\frac{\Delta x}{L}\right)^2 \frac{B_0^2}{\mu_0 L \r
 $$
 
 which for the meshes and fields of a real magnet arrangement is of the order of
-$10^3\ \mathrm{m^2/s^2}$ — **several times larger than the physical Lorentz
-force** ($\approx 200\ \mathrm{m^2/s^2}$ in the same conditions). The result is a
-non-physical body force that destabilises the solution.
+$10^3\ \mathrm{m/s^2}$ — **several times larger than the physical Lorentz
+acceleration** ($\approx 200\ \mathrm{m/s^2}$ in the same conditions). The result
+is a non-physical body force that destabilises the solution.
 
 This solver avoids the cancellation entirely: the current is obtained from a
 Poisson problem for the potential, so no large term is ever subtracted from
@@ -132,11 +132,22 @@ The case must provide, in `0/`:
 |---|---|
 | `U`, `p` | velocity and kinematic pressure |
 | `B0` | **prescribed** applied field (`volVectorField`, `fixedValue` on magnet patches) |
-| `PotE` | electric potential (`zeroGradient` on insulating walls) |
+| `PotE` | electric potential (`zeroGradient` on insulating walls; **`cyclic` on periodic patches**) |
 | turbulence fields | `nuTilda`(SA), `k`/`epsilon`, `k`/`omega` — as usual |
 
 and in `system/fvSolution` a `PotE` entry (solver) plus a `PotE` sub-dictionary
 with `PotERefCell`/`PotERefValue`.
+
+Two conditions have to match the solver, or the current will be wrong:
+
+- the insulating condition is imposed by excluding the boundary flux of
+  $\mathbf{u}\times\mathbf{B}_0$ on the **non-coupled** patches, in exchange for
+  `zeroGradient` on `PotE` there. On cyclic and processor patches the flux is an
+  internal one and is kept, so `PotE` must be `cyclic` (or `processor`) there —
+  `zeroGradient` on a periodic patch would break the coupling;
+- the applied field must satisfy $\nabla\cdot\mathbf{B}_0 = 0$ and
+  $\nabla\times\mathbf{B}_0 = 0$, so that the initial state carries no current.
+  The solver does not enforce this.
 
 ```bash
 decomposePar
@@ -152,8 +163,11 @@ fully developed MHD flow in a circular pipe with insulating walls
 $f\,Re$ as a function of the Hartmann number independently of $Re$.
 
 `cases/channelHartmann` contains a small plane-channel Hartmann case with the
-exact solution, used to verify the implementation in seconds. Results are
-reported in the accompanying paper and in `docs/formulation.md`.
+exact solution, used to verify the implementation in seconds. It reproduces the
+exact friction factor to within **0.055 %** at every Hartmann number
+($Ha = 0, 0.5, 1, 5, 10$), the largest deviation being at the strongest field
+and the smallest at $Ha = 0$; the five runs take about 15 s in total. Details
+are in the case README and in the accompanying paper.
 
 ## 7. Status and limitations
 

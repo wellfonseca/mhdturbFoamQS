@@ -24,8 +24,11 @@ Description
     cancellation is no longer exact, leaving a spurious force of order
     (dx/L)^2 B0^2/(mu0 L rho) that dominates the physical force.
 
-    Electrically insulating walls: j.n = 0 on all boundaries, implemented by
-    excluding the boundary flux of u x B0.
+    Electrically insulating boundaries: j.n = 0, implemented by excluding the
+    boundary flux of u x B0 on the non-coupled patches (walls and empty
+    patches) in exchange for zeroGradient on PotE there. On cyclic and
+    processor patches the flux is internal and is kept, so PotE must be cyclic
+    on those patches.
 
     Valid for Rm = mu0 sigma U L << 1.
 

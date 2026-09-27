@@ -52,8 +52,10 @@ here. The corresponding solver in this package is
 1. $\mathbf{B}_0$ as a `volVectorField` instead of a constant, enabling
    non-uniform applied fields.
 2. Consistent implementation of the insulating-wall condition
-   $\mathbf{j}\cdot\mathbf{n}=0$ by excluding the boundary flux of
-   $\mathbf{u}\times\mathbf{B}_0$ from the potential equation.
+   $\mathbf{j}\cdot\mathbf{n}=0$: the boundary flux of
+   $\mathbf{u}\times\mathbf{B}_0$ is excluded from the potential equation on the
+   non-coupled patches, in exchange for `zeroGradient` on $\phi$ there. On
+   cyclic and processor patches the flux is internal and is retained.
 3. `fvOptions` support in the momentum equation.
 4. Reference-cell treatment for the singular Poisson problem in closed or fully
    periodic domains.

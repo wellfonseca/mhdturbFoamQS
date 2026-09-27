@@ -98,8 +98,8 @@ $\rho = 10^3$ kg/m³, $\sigma = 70.9$ S/m, $U = 27.5$ m/s:
 | Quantity | Value |
 |---|---|
 | $B_0^2/(2\mu_0\rho)$ | $3.98\times10^4$ m²/s² |
-| physical Lorentz acceleration $\sigma B_0^2U/\rho$ | $1.9\times10^2$ m²/s² |
-| spurious acceleration from the discrete cancellation | $\sim10^3$ m²/s² |
+| physical Lorentz acceleration $\sigma B_0^2U/\rho$ | $1.9\times10^2$ m/s² |
+| spurious acceleration from the discrete cancellation | $\sim10^3$ m/s² |
 | outcome | floating-point exception within two time steps |
 
 The spurious term is thus several times the physical force. `mhdturbFoamQS`
@@ -114,7 +114,9 @@ the standard PISO pressure–velocity coupling of the OpenFOAM framework
 
 1. momentum predictor with the Lorentz force evaluated from the previous
    potential;
-2. pressure correctors, with `pFinal` used on the last non-orthogonal iteration;
+2. pressure correctors, repeated `nCorrectors` times with `rAU`, `HbyA` and
+   `phiHbyA` recomputed at every corrector, and `pFinal` used on the last PISO
+   iteration;
 3. explicit `fvOptions` correction.
 
 The potential equation is then assembled and solved,
@@ -137,6 +139,13 @@ given `zeroGradient` (so the wall contributes no Laplacian flux) *and* the
 boundary flux of $\mathbf{u}\times\mathbf{B}_0$ is excluded from the right-hand
 side. Omitting the second half silently imposes a conducting wall instead.
 
+The exclusion applies to the **non-coupled** patches only. On cyclic and
+processor patches the flux is an internal one and is retained, because
+`fvm::laplacian` does couple those patches; dropping it from the right-hand side
+alone would make the two sides of the equation inconsistent and place a
+spurious source in the cells next to the periodic plane. Correspondingly,
+`PotE` must be `cyclic` (not `zeroGradient`) on a periodic patch.
+
 ### Cell-centred current
 
 $$
@@ -151,9 +160,15 @@ The Lorentz force is then $\sigma\,\mathbf{j}_P\times\mathbf{B}_{0,P}$.
 
 1. **Plane-channel Hartmann case** (`cases/channelHartmann`), closed-form
    solution, runs in seconds. Checks the potential solve, the insulating
-   condition, the current reconstruction and the Lorentz force.
+   condition, the current reconstruction and the Lorentz force. Reproduces the
+   exact $f\,Re$ to within **0.055 %** at $Ha = 0, 0.5, 1, 5$ and 10
+   ($f\,Re = 95.9808$, $105.5680$, $134.1995$, $999.6654$ and $3553.5962$
+   against the exact $96.0000$, $105.5887$, $134.2249$, $999.9773$ and
+   $3555.5556$); the five runs take about 15 s in total.
 2. **Circular pipe, periodic, versus Gold/Shercliff**, for $Ha = 0, 1, 5, 10$,
-   which for $Ha=0$ must also reproduce the exact $f\,Re = 64$.
+   which for $Ha=0$ must also reproduce the exact $f\,Re = 64$. The case is not
+   part of this package; the reference values are quoted in the accompanying
+   paper.
 3. **Grid and time-step refinement** of both.
 4. **Cross-check against the full-induction solver** in its valid regime
    (uniform field), where both formulations must agree.

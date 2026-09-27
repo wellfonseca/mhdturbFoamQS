@@ -2,6 +2,8 @@
 [1-9][0-9]*/
 processor*/
 postProcessing/
+# any generated mesh, at any depth (blockMesh output is never input)
+polyMesh/
 log.*
 *.e[0-9]*
 *.o[0-9]*

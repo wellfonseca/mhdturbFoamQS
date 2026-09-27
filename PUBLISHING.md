@@ -1,82 +1,76 @@
-# Como publicar este repositório (GitHub/GitLab + Zenodo)
+# Publishing this repository (GitHub/GitLab + Zenodo)
 
-Este repositório já está inicializado localmente com o primeiro commit. Falta
-criá-lo num serviço público e arquivá-lo com DOI. Nada disto pode ser feito
-automaticamente daqui — requer as suas contas.
+The repository is already initialised locally and pushed. What remains is the
+permanent archive with a DOI, which the target journals require.
 
-## 1. Criar o repositório remoto
+## 1. Repository
 
-**GitHub** (via `gh`, se tiver o CLI autenticado):
+The project lives at <https://github.com/wellfonseca/mhdturbFoamQS>.
+
+To create the remote from scratch elsewhere (GitLab, or a fork):
 
 ```bash
-cd mhdturbFoamQS
 gh repo create mhdturbFoamQS --public --source=. --push \
    --description "Quasi-static MHD solver for OpenFOAM with non-uniform applied magnetic fields"
 ```
 
-**GitLab** (ou manualmente pela interface web, criando um projecto vazio):
+or, for GitLab:
 
 ```bash
-cd mhdturbFoamQS
-git remote add origin git@gitlab.com:<utilizador>/mhdturbFoamQS.git
+git remote add origin git@gitlab.com:<user>/mhdturbFoamQS.git
 git branch -M main
 git push -u origin main
 ```
 
-Depois de saber o URL, actualize:
+Remember to update `repository-code` in `CITATION.cff` afterwards.
 
-- `CITATION.cff` → campo `repository-code`
-- `README.md` → secção 8 (Citation) e secção 7 do artigo
+## 2. Archiving in Zenodo (the DOI)
 
-## 2. Arquivar no Zenodo (o DOI)
+**Option A — automatic integration (recommended).**
 
-**Opção A — integração automática (recomendada).**
+1. Sign in to <https://zenodo.org> **with GitHub**.
+2. Go to <https://zenodo.org/account/settings/github/> and flip the switch for
+   `wellfonseca/mhdturbFoamQS`.
+3. On GitHub, publish a release for the existing tag `v0.1.0`:
+   <https://github.com/wellfonseca/mhdturbFoamQS/releases/new?tag=v0.1.0>
+4. Zenodo archives the release automatically and mints a DOI. The deposit
+   metadata is pre-filled from `.zenodo.json`; paste the resulting DOI into
+   `CITATION.cff`, `README.md` and the accompanying paper.
 
-1. Entre em <https://zenodo.org> com a conta GitHub/GitLab.
-2. *Settings → GitHub* (ou GitLab) → ligue o interruptor do repositório
-   `mhdturbFoamQS`.
-3. No GitHub, crie uma *release* com a etiqueta `v0.1.0`:
-   ```bash
-   git tag -a v0.1.0 -m "mhdturbFoamQS 0.1.0 — verification against Hartmann and Shercliff–Gold solutions"
-   git push origin v0.1.0
-   ```
-4. O Zenodo arquiva automaticamente essa release e emite um **DOI**. Cole-o no
-   `README.md`, no `CITATION.cff` (`doi:`), no artigo e no artigo companheiro.
+**Option B — manual upload.**
 
-**Opção B — envio manual.** Crie um tarball e carregue-o em
-<https://zenodo.org/deposit/new>:
+Create an archive from a tag and upload it at <https://zenodo.org/deposit/new>:
 
 ```bash
-git archive --format=zip --prefix=mhdturbFoamQS-0.1.0/ -o /tmp/mhdturbFoamQS-0.1.0.zip HEAD
+git archive --format=zip --prefix=mhdturbFoamQS-0.1.0/ \
+    -o mhdturbFoamQS-0.1.0.zip v0.1.0
 ```
 
-Metadados a preencher: título e resumo (copiar de `CITATION.cff`), tipo
-*Software*, licença **GPL-3.0-or-later**, e os autores. Nos *related works*,
-acrescente as duas obras de que deriva (FOSSEE/Radhakrishnan 2019 e
-Tassone 2016) — está tudo no `NOTICE`.
+Metadata: copy from `.zenodo.json` (title, description, creators, keywords),
+resource type *Software*, licence **GPL-3.0-or-later**, and add the two upstream
+works as related identifiers — see `NOTICE`.
 
-## 3. Lista de verificação antes de submeter o artigo
+## 3. Checklist before submitting the paper
 
-- [ ] **A validação correu e passa.** `cd cases/channelHartmann && bash Allrun`
-      tem de reproduzir a Tabela 2 do artigo com desvio < 1 % em todos os `Ha`.
-      Enquanto isto não acontecer, o artigo não é submetível.
-- [ ] Tabela 2 (canal plano) preenchida.
-- [ ] Tabela 3 (tubo periódico vs Gold/Shercliff) preenchida.
-- [ ] Tabelas 4 e 5 (demonstração com ímanes alternados) preenchidas.
-- [ ] Secção 5.5 (a armadilha da parede condutora) demonstrada com números.
-- [ ] URL do repositório e DOI do Zenodo inseridos no artigo.
-- [ ] **Atribuições** confirmadas nos dois artigos: OpenFOAM, FOSSEE /
-      R. Radhakrishnan (2019) e Tassone (2016).
-- [ ] Texto obrigatório da CAPES com o ROR `00x0ma614` na secção *Funding*
-      (a APC da Meccanica é custeada pela CAPES — acordo Springer Nature,
-      revista híbrida confirmada na lista oficial).
-- [ ] ORCID registado em <https://meusdados.capes.gov.br/>.
-- [ ] Licença CC BY escolhida na submissão (exigência da CAPES).
-- [ ] Carta de apresentação declara a existência do artigo companheiro
-      (o das simulações) e a separação de conteúdos.
+- [ ] **Verification passes.** `cd cases/channelHartmann && bash Allrun` must
+      reproduce Table 2 of the paper with a deviation below 1 % at every `Ha`.
+      Until this holds, the paper cannot be submitted.
+- [ ] Tables 2 and 3 (plane channel and circular pipe) filled in.
+- [ ] Tables 4 and 5 (alternating-magnet demonstration) filled in.
+- [ ] Section 5.4 (the conducting-wall trap) demonstrated numerically.
+- [ ] Repository URL and Zenodo DOI inserted in the paper.
+- [ ] **Attribution** confirmed in both papers: OpenFOAM, FOSSEE /
+      R. Radhakrishnan (2019) and Tassone (2016).
+- [ ] Mandatory CAPES funding statement, with ROR `00x0ma614` (the Meccanica
+      article processing charge is covered by CAPES under the Springer Nature
+      agreement — a hybrid journal, confirmed in the official list).
+- [ ] ORCID registered at <https://meusdados.capes.gov.br/>.
+- [ ] CC BY licence selected at submission (CAPES requirement).
+- [ ] Cover letter states the existence of the companion paper (the simulation
+      study) and the separation of contents.
 
-## 4. Se quiser publicar sem custo de APC
+## 4. If no article processing charge can be paid
 
-A *OpenFOAM Journal* publica exactamente este tipo de desenvolvimento **sem
-taxa**, mas não tem factor de impacto. Mantenha-a como plano B caso a Meccanica
-recuse.
+The *OpenFOAM Journal* publishes exactly this kind of development **free of
+charge**, but has no impact factor. Keep it as a fallback should Meccanica
+decline.

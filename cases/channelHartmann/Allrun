@@ -1,0 +1,7 @@
+#!/bin/bash
+# Corre a verificacao do canal de Hartmann. Requer o solver instalado.
+set -e
+cd "${0%/*}" 2>/dev/null || true
+blockMesh > log.blockMesh 2>&1
+echo "blockMesh: $(grep -c 'FOAM FATAL' log.blockMesh) erros"
+python3 verifica.py

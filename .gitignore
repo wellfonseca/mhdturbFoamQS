@@ -1,0 +1,18 @@
+# OpenFOAM run products (mas o 0/ dos casos e' ENTRADA e fica versionado)
+[1-9][0-9]*/
+processor*/
+postProcessing/
+log.*
+*.e[0-9]*
+*.o[0-9]*
+# binarios e temporarios
+*.o
+*.so
+*.dep
+Make/linux*/
+platforms/
+*.swp
+
+# excepcao: os directorios 0/ dos casos sao entrada
+!cases/*/0/
+!cases/*/0/**

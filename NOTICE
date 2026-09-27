@@ -1,0 +1,64 @@
+# NOTICE — attribution and licensing
+
+`mhdturbFoamQS` is a derived work. It combines two independently published
+OpenFOAM solvers and inherits their licences. All three upstream works must be
+credited in any publication or redistribution.
+
+## 1. OpenFOAM
+
+The solver is built on OpenFOAM 6 (org), © 2011–2017 OpenFOAM Foundation,
+distributed under the GNU General Public License v3.0.
+
+- <https://openfoam.org/version/6>
+- In particular the base solver `mhdFoam` of the `grpElectroMagneticsSolvers`
+  group, from which the induction-formulation structure originates.
+
+## 2. `mhdturbFoam` — FOSSEE case-study project
+
+The turbulent MHD solver skeleton used here (PISO + `divDevReff` + standard
+closures) comes from:
+
+> **Rahul Radhakrishnan** (2019).
+> *Numerical study of flow of electrically conducting fluid over an airfoil.*
+> FOSSEE Case Study Project — CFD with OpenFOAM.
+> Vellore Institute of Technology, Vellore, India.
+> Developed on OpenFOAM v1812.
+
+FOSSEE (Free and Open Source Software for Education) is an initiative of
+IIT Bombay. The upstream `README.md` states that the solver is `mhdFoam` with
+"minor changes" and recommends a modified Spalart–Allmaras closure for MHD
+applications, citing:
+
+> D. C. Dietiker, K. A. Hoffmann (2003).
+> *Modified one-equation turbulence models for turbulent magnetohydrodynamic
+> flows.* Journal of Thermophysics and Heat Transfer 17(4):509–520.
+> <https://doi.org/10.2514/2.6796>
+
+## 3. `epotFoam` — Chalmers OpenFOAM course
+
+The electric-potential (quasi-static) coupling is taken from:
+
+> **Alessandro Tassone** (2016).
+> *Magnetic induction and electric potential solvers for incompressible MHD
+> flows.* CFD with OpenSource Software, Chalmers University of Technology.
+> <https://www.tfd.chalmers.se/~hani/kurser/OS_CFD_2016/AlessandroTassone/report_Tassone.pdf>
+
+The reference copy of the upstream source consulted is kept in
+`docs/referencia_epotFoam.C.txt` for traceability.
+
+## 4. What was added here
+
+1. $\mathbf{B}_0$ as a `volVectorField` instead of a constant, enabling
+   non-uniform applied fields.
+2. Consistent implementation of the insulating-wall condition
+   $\mathbf{j}\cdot\mathbf{n}=0$ by excluding the boundary flux of
+   $\mathbf{u}\times\mathbf{B}_0$ from the potential equation.
+3. `fvOptions` support in the momentum equation.
+4. Reference-cell treatment for the singular Poisson problem in closed or fully
+   periodic domains.
+
+## 5. Licence
+
+Because all upstream components are GPL v3, `mhdturbFoamQS` **must** be
+distributed under the GNU General Public License v3.0 (see `LICENSE`). Any
+redistribution must preserve this notice and the licence.

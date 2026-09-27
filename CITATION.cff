@@ -1,0 +1,58 @@
+cff-version: 1.2.0
+message: "If you use mhdturbFoamQS, please cite the accompanying paper and the two upstream works listed in NOTICE."
+title: "mhdturbFoamQS: a quasi-static MHD solver for OpenFOAM with non-uniform applied magnetic fields"
+abstract: >-
+  An OpenFOAM 6 solver for incompressible turbulent magnetohydrodynamic flows in
+  the low-magnetic-Reynolds-number regime, using the electric-potential
+  (quasi-static) formulation with a prescribed, possibly non-uniform, applied
+  magnetic field. It avoids the Maxwell-stress cancellation that makes
+  full-induction solvers fail with non-uniform applied fields, and keeps the
+  standard OpenFOAM turbulence closures unmodified.
+type: software
+license: GPL-3.0-or-later
+repository-code: "https://github.com/<org>/mhdturbFoamQS"
+version: "0.1.0"
+date-released: "2026-09-27"
+keywords:
+  - magnetohydrodynamics
+  - MHD
+  - OpenFOAM
+  - quasi-static approximation
+  - electric potential formulation
+  - turbulence modelling
+  - computational fluid dynamics
+authors:
+  # ATENÇÃO: lista sugerida, a confirmar pelo grupo (ver o manuscrito)
+  - family-names: Fonseca
+    given-names: Wellington da Silva
+    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
+    orcid: ""
+  - family-names: Araújo
+    given-names: Ramon C. F.
+    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
+    orcid: ""
+  - family-names: Silva
+    given-names: Marcelo de Oliveira e
+    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
+    orcid: ""
+  - family-names: Cruz
+    given-names: Daniel Onofre de A.
+    affiliation: "Mechanical Engineering Graduate Program, Federal University of Rio de Janeiro, Brazil"
+    orcid: ""
+references:
+  - type: software
+    title: "mhdturbFoam: an incompressible turbulent OpenFOAM solver for magnetohydrodynamic flows (FOSSEE case-study project)"
+    authors:
+      - family-names: Radhakrishnan
+        given-names: Rahul
+    year: 2019
+    notes: "FOSSEE, IIT Bombay; developed on OpenFOAM v1812"
+  - type: report
+    title: "Magnetic induction and electric potential solvers for incompressible MHD flows"
+    authors:
+      - family-names: Tassone
+        given-names: Alessandro
+    year: 2016
+    institution:
+      name: "Chalmers University of Technology"
+    notes: "CFD with OpenSource Software course report; source of the epotFoam solver"

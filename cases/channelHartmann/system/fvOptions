@@ -1,0 +1,9 @@
+FoamFile { version 2.0; format ascii; class dictionary; object fvOptions; }
+momentumSource
+{
+    type            vectorSemiImplicitSource;
+    selectionMode   all;
+    fields          (U);
+    volumeMode      specific;
+    injectionRateSuSp { U ((0.0105 0 0) 0); }
+}

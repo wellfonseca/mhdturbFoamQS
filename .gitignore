@@ -4,6 +4,10 @@ processor*/
 postProcessing/
 # any generated mesh, at any depth (blockMesh output is never input)
 polyMesh/
+# post-processing output: foamToVTK, parallel run bookkeeping
+VTK/
+uniform/
+*.foam
 log.*
 *.e[0-9]*
 *.o[0-9]*

@@ -45,9 +45,22 @@ bash Allrun      # blockMesh + mhdturbFoamQS
 
 `0/B0` ships with $B_0 = 0$ (plain plane Poiseuille). To run a Hartmann case, set
 both the `internalField` and the wall `value` of `0/B0` to $(0, B_0, 0)$ with the
-$B_0$ from the table above, then rerun. The bulk velocity is written as a volume
-average of `U` in `postProcessing/volFieldValue1/`; take its last value and form
-$f\,Re$ with the relations given above. `Allclean` removes the results.
+$B_0$ from the table above, then rerun. `Allclean` removes the results.
+
+The run writes the fields every 20 s ($t = 20, 40, 60, 80$) and the volume
+averages of `U` and `p` every 20 time steps, in
+`postProcessing/volFieldValue1/`. Take the last average and form $f\,Re$ with the
+relations above. To look at the solution, convert the written times and open the
+result in ParaView:
+
+```bash
+foamToVTK -ascii
+```
+
+Note that `foamToVTK` names the files after the **time index** (the step count),
+not the physical time: the final state, $t = 80$ s, is
+`VTK/channelHartmann_400.vtk`. Opening `VTK/channelHartmann_0.vtk` instead shows
+the initial condition, where $\mathbf{U} = 0$ everywhere.
 
 The case is deliberately tiny (100 cells, one cell in the streamwise direction):
 one $Ha$ runs in seconds, which is what makes it usable as a routine regression

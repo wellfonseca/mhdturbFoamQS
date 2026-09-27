@@ -164,13 +164,14 @@ fully developed MHD flow in a circular pipe with insulating walls
 $f\,Re$ as a function of the Hartmann number independently of $Re$.
 
 `cases/channelHartmann` contains a plane-channel Hartmann case with the exact
-solution, built on the geometry of the OpenFOAM 6 `mhdFoam/hartmann` tutorial and
-following the same conventions (`constant/fvOptions`, `#includeFunc`, profile
-sampled by the standard `sample` function). It reproduces the exact friction
-factor to within **0.055 %** at every Hartmann number
-($Ha = 0, 0.5, 1, 5, 10$), the largest deviation being at the strongest field
-and the smallest at $Ha = 0$; the five runs take about 20 s in total. Details
-are in the case README and in the accompanying paper.
+solution, built on the geometry **and the mesh** of the OpenFOAM 6
+`mhdFoam/hartmann` tutorial ($100\times40\times1$ cells) and following the same
+conventions (`constant/fvOptions`, `#includeFunc`, profile sampled by the
+standard `sample` function). The cross-channel direction is graded symmetrically
+towards both walls so that the Hartmann layer is resolved. It reproduces the
+exact friction factor to within **0.166 %** at every Hartmann number
+($Ha = 0, 0.5, 1, 5, 10$); the five runs take about 7 min in total. Details are
+in the case README and in the accompanying paper.
 
 ## 7. Status and limitations
 

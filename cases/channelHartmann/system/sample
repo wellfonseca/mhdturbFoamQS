@@ -32,9 +32,9 @@ sets
         // modo que os 100 pontos caem exactamente nos 100 centros de
         // celula e a amostragem reproduz o campo sem erro de
         // interpolacao.
-        start   (10 -0.99 0.05);
-        end     (10 0.99 0.05);
-        nPoints 100;
+        start   (10.1 -0.999 0.05);
+        end     (10.1 0.999 0.05);
+        nPoints 200;
     }
 );
 

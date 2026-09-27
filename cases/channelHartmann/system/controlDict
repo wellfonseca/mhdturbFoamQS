@@ -23,7 +23,7 @@ startTime       0;
 stopAt          endTime;
 endTime         8000;
 
-deltaT          10;
+deltaT          5;
 writeControl    runTime;
 writeInterval   2000;
 

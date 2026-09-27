@@ -1,21 +1,24 @@
 # `channelHartmann` — plane-channel verification against the exact solution
 
-A plane channel with the **same geometry as the OpenFOAM 6 tutorial**
+A plane channel with the **geometry and the mesh of the OpenFOAM 6 tutorial**
 `tutorials/electromagnetics/mhdFoam/hartmann`: length 20 m, height 2 m
-(half-width $h = 1$ m) and thickness 0.1 m. The layout follows the same OpenFOAM
-conventions as that tutorial — `constant/fvOptions`, `#includeFunc` function
-objects driven by dictionaries in `system/`, and an `Allrun` that ends by
-sampling the solution profile.
+(half-width $h = 1$ m), thickness 0.1 m, and a `blockMesh` of $100 \times 40
+\times 1$ cells. The layout follows the OpenFOAM conventions of that tutorial —
+`constant/fvOptions`, `#includeFunc` function objects driven by dictionaries in
+`system/`, and an `Allrun` that ends by sampling the solution profile.
 
-The one deliberate difference is that the streamwise direction is **cyclic**
-instead of inlet/outlet. With an inlet the flow is still developing, and the
-closed-form Hartmann solution — which describes *fully developed* flow — would
-not apply; with a cyclic patch the flow is fully developed by construction and
-the exact solution holds. The mesh follows the OpenFOAM convention for a fully
-developed periodic channel (cf. `planarPoiseuille`): a single cell in the
-streamwise direction, since nothing varies along $x$, and 100 cells across the
-channel so that the Hartmann layer ($h/Ha = 0.1$ m, i.e. 5 cells at $Ha = 10$)
-is resolved.
+Two deliberate differences:
+
+- the streamwise direction is **cyclic** instead of inlet/outlet. With an inlet
+  the flow is still developing, and the closed-form Hartmann solution — which
+  describes *fully developed* flow — would not apply. With a cyclic patch the
+  flow is fully developed by construction and the exact solution holds;
+- the mesh keeps the tutorial's $100 \times 40 \times 1$ cells but grades the
+  cross-channel direction **symmetrically** towards both walls
+  (`simpleGrading (1 ((0.5 0.5 4) (0.5 0.5 0.25)) 1)`). With a uniform mesh the
+  Hartmann layer is only two cells thick at $Ha = 10$ ($h/Ha = 0.1$ m against
+  $\Delta y = 0.05$ m) and the near-wall profile is off by 15 %; the symmetric
+  grading brings that below 0.5 %.
 
 The flow is driven by a constant pressure gradient imposed with
 `vectorSemiImplicitSource` in `constant/fvOptions`
@@ -39,17 +42,17 @@ for large $Ha$.
 
 ## Expected values
 
-| $Ha$ | $B_0$ (T) | $f\,Re$ exact | $f\,Re$ computed | deviation |
-|---|---|---|---|---|
-| 0.0 | 0.0000 | 96.0000 | 96.0066 | $+0.007$ % |
-| 0.5 | 0.0384 | 105.5887 | 105.5804 | $-0.008$ % |
-| 1.0 | 0.0768 | 134.2249 | 134.2008 | $-0.018$ % |
-| 5.0 | 0.3839 | 999.9773 | 999.6654 | $-0.031$ % |
-| 10.0 | 0.7678 | 3555.5556 | 3553.5961 | $-0.055$ % |
+| $Ha$ | $B_0$ (T) | $f\,Re$ exact | $f\,Re$ computed | deviation | profile error |
+|---|---|---|---|---|---|
+| 0.0 | 0.0000 | 96.0000 | 95.8402 | $-0.166$ % | 0.19 % |
+| 0.5 | 0.0384 | 105.5887 | 105.4138 | $-0.166$ % | 0.19 % |
+| 1.0 | 0.0768 | 134.2249 | 134.0326 | $-0.143$ % | 0.19 % |
+| 5.0 | 0.3839 | 999.9773 | 999.2622 | $-0.072$ % | 0.14 % |
+| 10.0 | 0.7678 | 3555.5556 | 3552.2457 | $-0.093$ % | 0.49 % |
 
-The computed values are the ones produced by the sampled profile described
-below; the largest deviation is 0.055 %, at the strongest field. The five runs
-take about 20 s in total.
+$\bar U$ is taken from the volume average below; the largest deviation in
+$f\,Re$ is 0.166 % and the worst pointwise profile error is 0.49 %. The five
+runs take about 7 min in total.
 
 ## Running
 
@@ -75,11 +78,12 @@ objects declared with `#includeFunc` in `system/controlDict`:
 | `postProcessing/volFieldValue/` | `system/volFieldValue` | volume averages of `U` and `p`, every 20 steps |
 | `postProcessing/sample/` | `system/sample` | the velocity profile across the channel at each written time |
 
-The profile is a line of 100 points placed **exactly on the 100 cell centres**,
-so the sampled data reproduce the field without interpolation error. The file
-`postProcessing/sample/<time>/centreProfile_U.xy` has four columns —
-distance, $U_x$, $U_y$, $U_z$ — and the average of $U_x$ over the 100 points is
-the bulk velocity $\bar U$ used above.
+The bulk velocity to use in $f\,Re$ is the **volume average** of $U_x$ from
+`postProcessing/volFieldValue/`. Because the mesh is graded, the plain average
+of the sampled profile is *not* the volume average; the sampled profile is there
+to compare the *shape* with the exact solution. The file
+`postProcessing/sample/<time>/centreProfile_U.xy` has four columns — distance,
+$U_x$, $U_y$, $U_z$.
 
 ## Notes
 
@@ -91,10 +95,15 @@ the bulk velocity $\bar U$ used above.
   the other imposes a conducting wall and the verification will fail. The flux
   is kept on cyclic patches: there it is internal, and dropping it would make
   the right-hand side inconsistent with the Laplacian.
+- The case is **laminar**, and has to be: the exact Hartmann solution is a
+  laminar solution, so switching on a turbulence closure would invalidate the
+  verification rather than extend it. The closures of the solver are exercised
+  by the duct simulations, not here.
 - The viscous transient of this geometry is long: the slowest channel mode
   decays with a time constant $4h^2/(\pi^2\nu) \approx 970$ s, which is why the
   case runs to $t = 8000$ s. The steady state itself does not depend on the time
-  step; a larger $\Delta t$ only changes how the transient is resolved.
+  step; a larger $\Delta t$ only changes how the transient is resolved. The time
+  step of 5 s keeps the Courant number near 0.25 on the 100-cell streamwise mesh.
 - The time step is not limited by the magnetic damping: the stiff part
   $-\sigma|\mathbf{B}_0|^2\mathbf{U}$ of the Lorentz force is discretised
   implicitly in the momentum equation.

@@ -159,14 +159,16 @@ The Lorentz force is then $\sigma\,\mathbf{j}_P\times\mathbf{B}_{0,P}$.
 ## 4. Verification procedure
 
 1. **Plane-channel Hartmann case** (`cases/channelHartmann`), closed-form
-   solution, runs in about 20 s for the five fields. It uses the channel
-   geometry of the OpenFOAM 6 `mhdFoam/hartmann` tutorial, made periodic in the
-   streamwise direction so that the flow is fully developed, and the profile is
-   written by the standard OpenFOAM `sample` function. Checks the potential
+   solution, runs in about 7 min for the five fields. It uses the channel
+   geometry and the $100\times40\times1$ mesh of the OpenFOAM 6
+   `mhdFoam/hartmann` tutorial, with the cross-channel direction graded
+   symmetrically towards both walls, made periodic in the streamwise direction
+   so that the flow is fully developed; the profile is written by the standard
+   OpenFOAM `sample` function. Checks the potential
    solve, the insulating condition, the current reconstruction and the Lorentz
-   force. Reproduces the exact $f\,Re$ to within **0.055 %** at
-   $Ha = 0, 0.5, 1, 5$ and 10 ($f\,Re = 96.0066$, $105.5804$, $134.2008$,
-   $999.6654$ and $3553.5961$ against the exact $96.0000$, $105.5887$,
+   force. Reproduces the exact $f\,Re$ to within **0.166 %** at
+   $Ha = 0, 0.5, 1, 5$ and 10 ($f\,Re = 95.8402$, $105.4138$, $134.0326$,
+   $999.2622$ and $3552.2457$ against the exact $96.0000$, $105.5887$,
    $134.2249$, $999.9773$ and $3555.5556$).
 2. **Circular pipe, periodic, versus Gold/Shercliff**, for $Ha = 0, 1, 5, 10$,
    which for $Ha=0$ must also reproduce the exact $f\,Re = 64$. The case is not

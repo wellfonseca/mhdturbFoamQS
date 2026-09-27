@@ -24,8 +24,9 @@ keywords:
   - computational fluid dynamics
 authors:
   - family-names: Fonseca
-    given-names: Wellington da Silva
-    affiliation: "Mechanical Engineering Graduate Program, Federal University of Pará, Belém, Brazil"
+    given-names: W. S.
+    affiliation: "Universidade Federal do Pará"
+    orcid: "https://orcid.org/0000-0002-2602-1964"
 references:
   - type: software
     title: "mhdturbFoam: an incompressible turbulent OpenFOAM solver for magnetohydrodynamic flows (FOSSEE case-study project)"

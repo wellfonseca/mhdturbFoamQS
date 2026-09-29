@@ -87,6 +87,14 @@ This solver avoids the cancellation entirely: the current is obtained from a
 Poisson problem for the potential, so no large term is ever subtracted from
 another.
 
+The stiff sink $-\sigma|\mathbf{B}_0|^2\mathbf{U}$ of the Lorentz force is
+discretised **implicitly**, which removes the explicit damping limit
+$\Delta t < 2\rho/(\sigma|\mathbf{B}_0|^2)$ that otherwise forces very small time
+steps at high Hartmann number. `docs/stability.md` carries the von Neumann
+analysis of the discretised operator — it shows $|G|\le1$ for every $\Delta t$ —
+together with the numerical confirmation, and `docs/formulation.md` derives the
+formulation itself.
+
 ## 3. Relation to existing codes
 
 `mhdturbFoamQS` is a combination of two existing, independently published pieces

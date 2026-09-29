@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"
+    #include "createTimeControls.H"
     #include "createFields.H"
     #include "initContinuityErrs.H"
 
@@ -84,6 +85,10 @@ int main(int argc, char *argv[])
         );
 
         #include "CourantNo.H"
+
+        // Needed for the adjustable time step: without it controlDict's
+        // adjustTimeStep/maxCo are silently ignored and dt stays fixed.
+        #include "setDeltaT.H"
 
         fvVectorMatrix UEqn
         (
